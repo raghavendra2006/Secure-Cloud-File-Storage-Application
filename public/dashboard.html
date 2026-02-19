@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard — SecureStore</title>
+    <meta name="description" content="Manage your cloud-stored files securely." />
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>" />
+</head>
+
+<body>
+
+    <!-- ════ SIDEBAR ════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <span class="sidebar-logo-icon">☁️</span>
+            <span class="sidebar-logo-text">SecureStore</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <p class="nav-section-title">Storage</p>
+
+            <div class="nav-item active" id="nav-all" onclick="setCategory('all')">
+                <span class="nav-icon">🗂️</span>
+                <span>All Files</span>
+                <span class="nav-badge" id="badge-all">0</span>
+            </div>
+            <div class="nav-item" id="nav-image" onclick="setCategory('image')">
+                <span class="nav-icon">🖼️</span>
+                <span>Images</span>
+                <span class="nav-badge" id="badge-image">0</span>
+            </div>
+            <div class="nav-item" id="nav-video" onclick="setCategory('video')">
+                <span class="nav-icon">🎥</span>
+                <span>Videos</span>
+                <span class="nav-badge" id="badge-video">0</span>
+            </div>
+            <div class="nav-item" id="nav-audio" onclick="setCategory('audio')">
+                <span class="nav-icon">🎵</span>
+                <span>Audios</span>
+                <span class="nav-badge" id="badge-audio">0</span>
+            </div>
+            <div class="nav-item" id="nav-document" onclick="setCategory('document')">
+                <span class="nav-icon">📄</span>
+                <span>Documents</span>
+                <span class="nav-badge" id="badge-document">0</span>
+            </div>
+            <div class="nav-item" id="nav-other" onclick="setCategory('other')">
+                <span class="nav-icon">📦</span>
+                <span>Others</span>
+                <span class="nav-badge" id="badge-other">0</span>
+            </div>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-card">
+                <div class="user-avatar" id="user-avatar">?</div>
+                <div>
+                    <div class="user-name" id="user-name">Loading...</div>
+                    <div class="user-email" id="user-email"></div>
+                </div>
+                <button class="btn-logout" title="Logout" onclick="logout()">⏻</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ════ MAIN CONTENT ═══════════════════════════════ -->
+    <div class="main-content">
+
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+                <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
+                <div>
+                    <div class="header-title" id="header-title">All Files</div>
+                    <div class="header-subtitle" id="header-subtitle">Manage your cloud storage</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('upload-input').click()">
+                    ⬆️ Upload File
+                </button>
+            </div>
+        </header>
+
+        <!-- Body -->
+        <div class="dashboard-body">
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-card">
+                    <span class="stat-icon">🗂️</span>
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Files</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🖼️</span>
+                    <div class="stat-value" id="stat-images">0</div>
+                    <div class="stat-label">Images</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">🎥</span>
+                    <div class="stat-value" id="stat-videos">0</div>
+                    <div class="stat-label">Videos</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">💾</span>
+                    <div class="stat-value" id="stat-storage">0 MB</div>
+                    <div class="stat-label">Storage Used</div>
+                </div>
+            </div>
+
+            <!-- Upload Zone -->
+            <div class="upload-section">
+                <div class="section-header">
+                    <h2 class="section-title">⬆️ Upload Files</h2>
+                </div>
+                <div class="dropzone" id="dropzone">
+                    <input type="file" id="upload-input" multiple onchange="handleFileSelect(this.files)" />
+                    <div class="dropzone-icon">📂</div>
+                    <div class="dropzone-text">Drop files here or click to browse</div>
+                    <div class="dropzone-sub">All file types supported • Max 500 MB each</div>
+                </div>
+                <div class="upload-progress" id="upload-progress">
+                    <p id="upload-progress-label"
+                        style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;"></p>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Files Section -->
+            <div class="files-section">
+                <div class="section-header">
+                    <h2 class="section-title">📁 Your Files</h2>
+                    <button class="btn-icon" title="Refresh" onclick="loadFiles()">🔄</button>
+                </div>
+
+                <div class="filters-row">
+                    <button class="filter-chip active" id="chip-all" onclick="setCategory('all')">All</button>
+                    <button class="filter-chip" id="chip-image" onclick="setCategory('image')">🖼️ Images</button>
+                    <button class="filter-chip" id="chip-video" onclick="setCategory('video')">🎥 Videos</button>
+                    <button class="filter-chip" id="chip-audio" onclick="setCategory('audio')">🎵 Audio</button>
+                    <button class="filter-chip" id="chip-document" onclick="setCategory('document')">📄
+                        Documents</button>
+                    <button class="filter-chip" id="chip-other" onclick="setCategory('other')">📦 Other</button>
+                </div>
+
+                <div class="files-grid" id="files-grid">
+                    <!-- Cards rendered by JS -->
+                    <div class="empty-state" id="loading-state">
+                        <div class="empty-icon">⏳</div>
+                        <div class="empty-title">Loading your files...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ OTP MODAL ══════════════════════════════════ -->
+    <div class="modal-overlay" id="otp-modal">
+        <div class="modal" role="dialog" aria-modal="true" aria-labelledby="otp-title">
+            <div class="modal-header">
+                <div class="modal-icon">📧</div>
+                <h2 class="modal-title" id="otp-title">Verify Download</h2>
+                <p class="modal-desc">
+                    An OTP has been sent to your email.<br />
+                    Enter it below to download <strong class="modal-file" id="otp-filename"></strong>
+                </p>
+            </div>
+
+            <div class="alert alert-error" id="otp-error" role="alert" style="margin-bottom:0;">
+                <span>⚠️</span> <span id="otp-error-msg"></span>
+            </div>
+
+            <div class="otp-input-row" id="otp-input-row">
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d0" />
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d1" />
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d2" />
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d3" />
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d4" />
+                <input class="otp-digit" type="text" maxlength="1" inputmode="numeric" pattern="[0-9]" id="otp-d5" />
+            </div>
+
+            <div class="otp-timer" id="otp-timer">⏱ OTP expires in <strong id="otp-countdown">5:00</strong></div>
+
+            <div class="modal-actions" style="margin-top:20px;">
+                <button class="btn btn-primary" id="otp-verify-btn" onclick="verifyOTP()">
+                    <span id="otp-btn-text">Verify & Download</span>
+                </button>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn"
+                        style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                        onclick="closeOTPModal()">Cancel</button>
+                    <button class="btn"
+                        style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                        id="resend-btn" onclick="resendOTP()">↺ Resend</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ════ REPLACE FILE MODAL ═════════════════════════ -->
+    <div class="modal-overlay" id="replace-modal">
+        <div class="modal" role="dialog" aria-modal="true">
+            <div class="modal-header">
+                <div class="modal-icon">🔄</div>
+                <h2 class="modal-title">Replace File</h2>
+                <p class="modal-desc">Select a new file to replace <strong class="modal-file"
+                        id="replace-filename"></strong></p>
+            </div>
+            <div style="margin: 20px 0;">
+                <input type="file" id="replace-input" style="display:none;" onchange="doReplace(this.files[0])" />
+                <button class="btn btn-primary" onclick="document.getElementById('replace-input').click()">
+                    📂 Choose Replacement File
+                </button>
+            </div>
+            <button class="btn"
+                style="width:100%; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                onclick="closeReplaceModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- ════ TOAST CONTAINER ════════════════════════════ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

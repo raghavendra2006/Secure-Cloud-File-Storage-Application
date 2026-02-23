@@ -1,21 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SecureStore — Secure Cloud File Storage</title>
-  <meta name="description" content="Securely upload, manage and download your files from the cloud with OTP-verified downloads and AWS S3 storage." />
+  <meta name="description"
+    content="Securely upload, manage and download your files from the cloud with OTP-verified downloads and AWS S3 storage." />
   <link rel="stylesheet" href="/css/style.css" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>" />
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
+
 <body>
+
+  <!-- 3D CANVAS (Three.js renders here) -->
+  <canvas id="three-canvas"></canvas>
+
+  <!-- Retro grid floor -->
+  <div class="grid-floor"></div>
+
   <div class="auth-wrapper">
-    <!-- Banner -->
+    <!-- ═══ BANNER ═══ -->
     <div class="auth-banner">
       <div class="banner-content">
+        <!-- 3D rotating ring -->
+        <div class="banner-glow-ring"></div>
         <div class="banner-logo">☁️</div>
         <h1 class="banner-title">SecureStore</h1>
-        <p class="banner-subtitle">Your personal cloud vault. Store, manage, and download files securely with OTP verification.</p>
+        <p class="banner-subtitle">Your personal cloud vault. Store, manage, and download files securely with OTP
+          verification.</p>
         <div class="banner-features">
           <div class="feature-item">
             <div class="feature-icon">🔐</div>
@@ -37,7 +52,7 @@
       </div>
     </div>
 
-    <!-- Auth Panel -->
+    <!-- ═══ AUTH PANEL ═══ -->
     <div class="auth-panel">
       <div class="auth-box">
         <div class="auth-tabs">
@@ -48,7 +63,7 @@
         <!-- Login Form -->
         <div class="auth-form active" id="form-login">
           <h2 class="auth-heading">Welcome back 👋</h2>
-          <p class="auth-subheading">Sign in to access your cloud storage dashboard.</p>
+          <p class="auth-subheading">Sign in to access your secure cloud vault.</p>
 
           <div class="alert alert-error" id="login-error" role="alert">
             <span>⚠️</span> <span id="login-error-msg"></span>
@@ -59,14 +74,16 @@
               <label class="form-label" for="login-email">Email address</label>
               <div class="input-wrapper">
                 <span class="input-icon">✉️</span>
-                <input class="form-input" type="email" id="login-email" placeholder="you@example.com" required autocomplete="email" />
+                <input class="form-input" type="email" id="login-email" placeholder="you@example.com" required
+                  autocomplete="email" />
               </div>
             </div>
             <div class="form-group">
               <label class="form-label" for="login-password">Password</label>
               <div class="input-wrapper">
                 <span class="input-icon">🔑</span>
-                <input class="form-input" type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+                <input class="form-input" type="password" id="login-password" placeholder="••••••••" required
+                  autocomplete="current-password" />
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="login-btn">
@@ -74,9 +91,10 @@
             </button>
           </form>
 
-          <p style="margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          <p style="margin-top: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
             Don't have an account?
-            <a href="#" onclick="switchTab('register')" style="color: var(--accent); font-weight: 600;">Create one</a>
+            <a href="#" onclick="switchTab('register')" style="color: var(--gold); font-weight: 700;">Create
+              one</a>
           </p>
         </div>
 
@@ -97,21 +115,24 @@
               <label class="form-label" for="reg-name">Full name</label>
               <div class="input-wrapper">
                 <span class="input-icon">👤</span>
-                <input class="form-input" type="text" id="reg-name" placeholder="Jane Doe" required autocomplete="name" />
+                <input class="form-input" type="text" id="reg-name" placeholder="Jane Doe" required
+                  autocomplete="name" />
               </div>
             </div>
             <div class="form-group">
               <label class="form-label" for="reg-email">Email address</label>
               <div class="input-wrapper">
                 <span class="input-icon">✉️</span>
-                <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" required autocomplete="email" />
+                <input class="form-input" type="email" id="reg-email" placeholder="you@example.com" required
+                  autocomplete="email" />
               </div>
             </div>
             <div class="form-group">
               <label class="form-label" for="reg-password">Password</label>
               <div class="input-wrapper">
                 <span class="input-icon">🔑</span>
-                <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 characters" required autocomplete="new-password" />
+                <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 characters" required
+                  autocomplete="new-password" />
               </div>
             </div>
             <button type="submit" class="btn btn-primary" id="register-btn">
@@ -119,9 +140,9 @@
             </button>
           </form>
 
-          <p style="margin-top: 20px; text-align: center; color: var(--text-muted); font-size: 13px;">
+          <p style="margin-top: 24px; text-align: center; color: var(--text-muted); font-size: 13px;">
             Already have an account?
-            <a href="#" onclick="switchTab('login')" style="color: var(--accent); font-weight: 600;">Sign in</a>
+            <a href="#" onclick="switchTab('login')" style="color: var(--neon-cyan); font-weight: 700;">Sign in</a>
           </p>
         </div>
       </div>
@@ -130,4 +151,5 @@
 
   <script src="/js/auth.js"></script>
 </body>
+
 </html>

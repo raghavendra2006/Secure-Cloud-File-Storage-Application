@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════
-   SECURESTORE DASHBOARD — JavaScript
+   SECURESTORE DASHBOARD — Gold Luxury Edition
 ═══════════════════════════════════════════════════════ */
 
 const API = '';
@@ -10,6 +10,140 @@ let currentDownloadFileName = null;
 let currentReplaceFileId = null;
 let otpTimerInterval = null;
 let otpExpiresAt = null;
+
+/* ══════════════════════════════════
+   THREE.JS 3D BACKGROUND — GOLD
+══════════════════════════════════ */
+(function init3DBackground() {
+    const canvas = document.getElementById('three-canvas');
+    if (!canvas || typeof THREE === 'undefined') return;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.z = 35;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    let mouse = { x: 0, y: 0 };
+    document.addEventListener('mousemove', (e) => {
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+    });
+
+    window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ─── Gold Wireframe Objects ──────────────────
+    const geometries = [];
+    const shapeFactories = [
+        () => new THREE.IcosahedronGeometry(0.9, 0),
+        () => new THREE.OctahedronGeometry(0.8, 0),
+        () => new THREE.TetrahedronGeometry(0.7, 0),
+        () => new THREE.TorusGeometry(0.6, 0.2, 6, 12),
+        () => new THREE.BoxGeometry(0.8, 0.8, 0.8),
+    ];
+
+    for (let i = 0; i < 12; i++) {
+        const geo = shapeFactories[Math.floor(Math.random() * shapeFactories.length)]();
+        const mat = new THREE.MeshBasicMaterial({
+            color: new THREE.Color().setHSL(0.08 + Math.random() * 0.06, 0.65, 0.25 + Math.random() * 0.1),
+            wireframe: true,
+            transparent: true,
+            opacity: 0.07 + Math.random() * 0.06,
+        });
+        const mesh = new THREE.Mesh(geo, mat);
+        mesh.position.set(
+            (Math.random() - 0.5) * 70,
+            (Math.random() - 0.5) * 50,
+            (Math.random() - 0.5) * 30 - 10
+        );
+        mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+        mesh.userData = {
+            rotSpeed: { x: (Math.random() - 0.5) * 0.005, y: (Math.random() - 0.5) * 0.005 },
+            floatSpeed: 0.2 + Math.random() * 0.4,
+            floatOffset: Math.random() * Math.PI * 2,
+            baseY: mesh.position.y,
+        };
+        scene.add(mesh);
+        geometries.push(mesh);
+    }
+
+    // ─── Gold Particle Field ────────────────────
+    const particleCount = 350;
+    const positions = new Float32Array(particleCount * 3);
+    const pColors = new Float32Array(particleCount * 3);
+    for (let i = 0; i < particleCount; i++) {
+        positions[i * 3] = (Math.random() - 0.5) * 100;
+        positions[i * 3 + 1] = (Math.random() - 0.5) * 70;
+        positions[i * 3 + 2] = (Math.random() - 0.5) * 50 - 10;
+        const c = new THREE.Color().setHSL(0.08 + Math.random() * 0.07, 0.5, 0.4 + Math.random() * 0.2);
+        pColors[i * 3] = c.r;
+        pColors[i * 3 + 1] = c.g;
+        pColors[i * 3 + 2] = c.b;
+    }
+    const pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    pGeo.setAttribute('color', new THREE.BufferAttribute(pColors, 3));
+    const pMat = new THREE.PointsMaterial({
+        size: 0.06,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.45,
+        sizeAttenuation: true,
+    });
+    const pts = new THREE.Points(pGeo, pMat);
+    scene.add(pts);
+
+    const clock = new THREE.Clock();
+
+    function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        camera.position.x += (mouse.x * 2 - camera.position.x) * 0.015;
+        camera.position.y += (mouse.y * 1.5 - camera.position.y) * 0.015;
+        camera.lookAt(0, 0, 0);
+
+        geometries.forEach((mesh) => {
+            mesh.rotation.x += mesh.userData.rotSpeed.x;
+            mesh.rotation.y += mesh.userData.rotSpeed.y;
+            mesh.position.y = mesh.userData.baseY + Math.sin(t * mesh.userData.floatSpeed + mesh.userData.floatOffset) * 1.2;
+        });
+
+        pts.rotation.y = t * 0.012;
+
+        renderer.render(scene, camera);
+    }
+    animate();
+})();
+
+/* ══════════════════════════════════
+   3D CARD TILT EFFECT
+══════════════════════════════════ */
+function init3DCardTilt() {
+    document.querySelectorAll('.file-card').forEach((card) => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateY = ((x - centerX) / centerX) * 8;
+            const rotateX = ((centerY - y) / centerY) * 6;
+            card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale(1)';
+        });
+    });
+}
 
 /* ── Auth Guard ─────────────────────────────────────── */
 const token = localStorage.getItem('token');
@@ -41,10 +175,10 @@ function logout() {
 /* ── Toast Notifications ────────────────────────────── */
 function toast(message, type = 'info') {
     const container = document.getElementById('toast-container');
-    const icons = { success: '✅', error: '❌', info: 'ℹ️' };
+    const icons = { success: '✅', error: '❌', info: '💡' };
     const t = document.createElement('div');
     t.className = `toast toast-${type}`;
-    t.innerHTML = `<span>${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+    t.innerHTML = `<span>${icons[type] || '💡'}</span><span>${message}</span>`;
     container.appendChild(t);
     setTimeout(() => t.remove(), 4000);
 }
@@ -100,18 +234,35 @@ function updateStats() {
     const videos = allFiles.filter((f) => f.category === 'video').length;
     const totalBytes = allFiles.reduce((s, f) => s + f.size, 0);
 
-    document.getElementById('stat-total').textContent = total;
-    document.getElementById('stat-images').textContent = images;
-    document.getElementById('stat-videos').textContent = videos;
+    animateCounter('stat-total', total);
+    animateCounter('stat-images', images);
+    animateCounter('stat-videos', videos);
     document.getElementById('stat-storage').textContent = formatBytes(totalBytes);
 
-    // Nav badges
     const categories = ['image', 'video', 'audio', 'document', 'other'];
     document.getElementById('badge-all').textContent = total;
     categories.forEach((cat) => {
         const el = document.getElementById('badge-' + cat);
         if (el) el.textContent = allFiles.filter((f) => f.category === cat).length;
     });
+}
+
+/* ── Counter Animation ─────────────────────────────── */
+function animateCounter(id, target) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const start = parseInt(el.textContent) || 0;
+    if (start === target) return;
+    const duration = 700;
+    const startTime = performance.now();
+
+    function step(now) {
+        const progress = Math.min((now - startTime) / duration, 1);
+        const eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(start + (target - start) * eased);
+        if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
 }
 
 /* ── Render Files ───────────────────────────────────── */
@@ -131,16 +282,17 @@ function renderFiles() {
         return;
     }
 
-    grid.innerHTML = filtered.map((file) => fileCardHTML(file)).join('');
+    grid.innerHTML = filtered.map((file, i) => fileCardHTML(file, i)).join('');
+    requestAnimationFrame(() => init3DCardTilt());
 }
 
-function fileCardHTML(file) {
-    const emoji = getCategoryEmoji(file.category);
+function fileCardHTML(file, index) {
     const preview = previewHTML(file);
     const date = new Date(file.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const delay = Math.min(index * 0.06, 0.5);
 
     return `
-    <div class="file-card fade-in" data-id="${file._id}">
+    <div class="file-card fade-in" data-id="${file._id}" style="animation-delay: ${delay}s">
       <div class="file-preview">
         ${preview}
         <span class="file-category-badge">${file.category}</span>
@@ -167,24 +319,21 @@ function previewHTML(file) {
         return `<img src="${file.s3Url}" alt="${escapeHtml(file.originalName)}" loading="lazy" onerror="this.parentElement.innerHTML='<span style=font-size:52px>🖼️</span>'" />`;
     }
     const emojis = { video: '🎥', audio: '🎵', document: '📄', other: '📦' };
-    return `<span style="font-size:56px;">${emojis[file.category] || '📁'}</span>`;
+    return `<span style="font-size:56px; position:relative; z-index:1;">${emojis[file.category] || '📁'}</span>`;
 }
 
 /* ── Category Navigation ────────────────────────────── */
 function setCategory(cat) {
     currentCategory = cat;
 
-    // Nav items
     document.querySelectorAll('.nav-item').forEach((el) => el.classList.remove('active'));
     const navEl = document.getElementById('nav-' + cat);
     if (navEl) navEl.classList.add('active');
 
-    // Filter chips
     document.querySelectorAll('.filter-chip').forEach((el) => el.classList.remove('active'));
     const chipEl = document.getElementById('chip-' + cat);
     if (chipEl) chipEl.classList.add('active');
 
-    // Header
     const titles = {
         all: 'All Files', image: 'Images', video: 'Videos',
         audio: 'Audio Files', document: 'Documents', other: 'Other Files'
@@ -229,7 +378,7 @@ async function handleFileSelect(files) {
             if (!res) return;
             const data = await res.json();
             if (!data.success) throw new Error(data.message);
-            toast(`✅ "${file.name}" uploaded!`, 'success');
+            toast(`"${file.name}" uploaded!`, 'success');
         } catch (err) {
             toast(`Failed to upload "${file.name}": ${err.message}`, 'error');
         }
@@ -242,14 +391,13 @@ async function handleFileSelect(files) {
         fillEl.style.width = '0%';
     }, 1500);
 
-    // Reset file input
     document.getElementById('upload-input').value = '';
     await loadFiles();
 }
 
 /* ── Delete File ────────────────────────────────────── */
 async function deleteFile(fileId, fileName) {
-    if (!confirm(`Delete "${fileName}"?\n\nThis will permanently remove it from S3 and cannot be undone.`)) return;
+    if (!confirm(`Delete "${fileName}"?\n\nThis will permanently remove it from S3.`)) return;
 
     try {
         const res = await apiFetch(`/api/files/${fileId}`, { method: 'DELETE' });
@@ -257,7 +405,15 @@ async function deleteFile(fileId, fileName) {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        toast(`"${fileName}" deleted successfully.`, 'success');
+        const card = document.querySelector(`.file-card[data-id="${fileId}"]`);
+        if (card) {
+            card.style.transition = '0.5s cubic-bezier(0.16, 1, 0.3, 1)';
+            card.style.transform = 'perspective(800px) rotateY(15deg) scale(0.8)';
+            card.style.opacity = '0';
+            await new Promise(r => setTimeout(r, 500));
+        }
+
+        toast(`"${fileName}" deleted.`, 'success');
         await loadFiles();
     } catch (err) {
         toast('Delete failed: ' + err.message, 'error');
@@ -289,7 +445,7 @@ async function doReplace(file) {
         if (!res) return;
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
-        toast('File replaced successfully!', 'success');
+        toast('File replaced!', 'success');
         await loadFiles();
     } catch (err) {
         toast('Replace failed: ' + err.message, 'error');
@@ -322,11 +478,9 @@ function openOTPModal(fileName) {
     document.getElementById('otp-error').classList.remove('show');
     clearOTPInputs();
 
-    // Start countdown (5 mins)
     otpExpiresAt = Date.now() + 5 * 60 * 1000;
     startOTPTimer();
-
-    setTimeout(() => document.getElementById('otp-d0').focus(), 100);
+    setTimeout(() => document.getElementById('otp-d0').focus(), 250);
 }
 
 function closeOTPModal() {
@@ -407,7 +561,6 @@ async function verifyOTP() {
         const data = await res.json();
         if (!data.success) throw new Error(data.message);
 
-        // Trigger file download via presigned URL
         const a = document.createElement('a');
         a.href = data.downloadUrl;
         a.download = data.fileName;
@@ -441,18 +594,18 @@ async function resendOTP() {
 
         otpExpiresAt = Date.now() + 5 * 60 * 1000;
         startOTPTimer();
-        toast('New OTP sent to your email!', 'success');
+        toast('New OTP sent!', 'success');
         document.getElementById('otp-d0').focus();
     } catch (err) {
-        toast('Failed to resend OTP: ' + err.message, 'error');
+        toast('Failed to resend: ' + err.message, 'error');
     }
 }
 
 /* ── OTP Timer ──────────────────────────────────────── */
 function startOTPTimer() {
     clearOTPTimer();
-    const timerEl = document.getElementById('otp-timer');
     const countdownEl = document.getElementById('otp-countdown');
+    const timerEl = document.getElementById('otp-timer');
 
     otpTimerInterval = setInterval(() => {
         const remaining = Math.max(0, Math.floor((otpExpiresAt - Date.now()) / 1000));
@@ -478,7 +631,7 @@ function clearOTPTimer() {
     document.getElementById('otp-timer').classList.remove('danger');
 }
 
-/* ── Sidebar Mobile Toggle ──────────────────────────── */
+/* ── Sidebar Toggle ─────────────────────────────────── */
 function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
 }
@@ -512,4 +665,12 @@ document.getElementById('otp-modal').addEventListener('click', (e) => {
 });
 document.getElementById('replace-modal').addEventListener('click', (e) => {
     if (e.target === document.getElementById('replace-modal')) closeReplaceModal();
+});
+
+// Close modals on Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        if (document.getElementById('otp-modal').classList.contains('show')) closeOTPModal();
+        if (document.getElementById('replace-modal').classList.contains('show')) closeReplaceModal();
+    }
 });

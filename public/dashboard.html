@@ -9,9 +9,14 @@
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="icon"
         href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>☁️</text></svg>" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
 
 <body>
+
+    <!-- 3D CANVAS -->
+    <canvas id="three-canvas"></canvas>
+    <div class="grid-floor"></div>
 
     <!-- ════ SIDEBAR ════════════════════════════════════ -->
     <aside class="sidebar" id="sidebar">
@@ -70,9 +75,8 @@
     <!-- ════ MAIN CONTENT ═══════════════════════════════ -->
     <div class="main-content">
 
-        <!-- Header -->
         <header class="dashboard-header">
-            <div style="display:flex; align-items:center; gap:12px;">
+            <div style="display:flex; align-items:center; gap:14px;">
                 <button class="hamburger" id="hamburger" onclick="toggleSidebar()">☰</button>
                 <div>
                     <div class="header-title" id="header-title">All Files</div>
@@ -86,29 +90,28 @@
             </div>
         </header>
 
-        <!-- Body -->
         <div class="dashboard-body">
 
             <!-- Stats -->
             <div class="stats-row">
-                <div class="stat-card">
-                    <span class="stat-icon">🗂️</span>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">🗂️</div>
                     <div class="stat-value" id="stat-total">0</div>
                     <div class="stat-label">Total Files</div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🖼️</span>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">🖼️</div>
                     <div class="stat-value" id="stat-images">0</div>
                     <div class="stat-label">Images</div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">🎥</span>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">🎥</div>
                     <div class="stat-value" id="stat-videos">0</div>
                     <div class="stat-label">Videos</div>
                 </div>
-                <div class="stat-card">
-                    <span class="stat-icon">💾</span>
-                    <div class="stat-value" id="stat-storage">0 MB</div>
+                <div class="stat-card fade-in">
+                    <div class="stat-icon">💾</div>
+                    <div class="stat-value" id="stat-storage">0 B</div>
                     <div class="stat-label">Storage Used</div>
                 </div>
             </div>
@@ -126,7 +129,7 @@
                 </div>
                 <div class="upload-progress" id="upload-progress">
                     <p id="upload-progress-label"
-                        style="font-size:13px; color:var(--text-secondary); margin-bottom:6px;"></p>
+                        style="font-size:13px; color:var(--text-secondary); margin-bottom:8px; font-weight:600;"></p>
                     <div class="progress-bar-bg">
                         <div class="progress-bar-fill" id="progress-bar-fill"></div>
                     </div>
@@ -151,7 +154,6 @@
                 </div>
 
                 <div class="files-grid" id="files-grid">
-                    <!-- Cards rendered by JS -->
                     <div class="empty-state" id="loading-state">
                         <div class="empty-icon">⏳</div>
                         <div class="empty-title">Loading your files...</div>
@@ -188,16 +190,16 @@
 
             <div class="otp-timer" id="otp-timer">⏱ OTP expires in <strong id="otp-countdown">5:00</strong></div>
 
-            <div class="modal-actions" style="margin-top:20px;">
+            <div class="modal-actions" style="margin-top:24px;">
                 <button class="btn btn-primary" id="otp-verify-btn" onclick="verifyOTP()">
                     <span id="otp-btn-text">Verify & Download</span>
                 </button>
                 <div style="display:flex; gap:10px;">
                     <button class="btn"
-                        style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                        style="flex:1; background:var(--bg-glass); border:1px solid var(--border); color:var(--text-secondary); backdrop-filter:blur(20px);"
                         onclick="closeOTPModal()">Cancel</button>
                     <button class="btn"
-                        style="flex:1; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                        style="flex:1; background:var(--bg-glass); border:1px solid var(--border); color:var(--text-secondary); backdrop-filter:blur(20px);"
                         id="resend-btn" onclick="resendOTP()">↺ Resend</button>
                 </div>
             </div>
@@ -213,14 +215,14 @@
                 <p class="modal-desc">Select a new file to replace <strong class="modal-file"
                         id="replace-filename"></strong></p>
             </div>
-            <div style="margin: 20px 0;">
+            <div style="margin: 24px 0;">
                 <input type="file" id="replace-input" style="display:none;" onchange="doReplace(this.files[0])" />
                 <button class="btn btn-primary" onclick="document.getElementById('replace-input').click()">
                     📂 Choose Replacement File
                 </button>
             </div>
             <button class="btn"
-                style="width:100%; background:var(--bg-card); border:1px solid var(--border); color:var(--text-secondary);"
+                style="width:100%; background:var(--bg-glass); border:1px solid var(--border); color:var(--text-secondary); backdrop-filter:blur(20px);"
                 onclick="closeReplaceModal()">Cancel</button>
         </div>
     </div>

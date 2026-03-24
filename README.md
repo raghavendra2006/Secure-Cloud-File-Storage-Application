@@ -163,9 +163,3 @@ Make sure your S3 bucket has the following settings:
   }
 ]
 ```
-
----
-
-## 📜 License
-
-MIT License — free to use and modify.
